@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', 'PassportController@login');
 Route::post('register', 'PassportController@register');
 
-Route::middleware('auth:api')->groupby(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('user', 'PassportController@details');
     Route::resource('todos', 'TodoController');
 });
