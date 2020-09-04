@@ -14,7 +14,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        // 'App\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -25,7 +25,14 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        Passport::routs();
-        //
+        Passport::routes();
+
+        Passport::personalAccessClientId(
+            config('passport.personal_access_client.id')
+        );
+
+        Passport::personalAccessClientSecret(
+            config('passport.personal_access_client.secret')
+        );
     }
 }
