@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+Route::middleware('auth:api')->group(function () {
     Route::get('user', 'AuthController@details');
     Route::resource('todos', 'TodoController');
-
+    Route::get('{id}/complete', 'TodoController@complete');
+});
 
 Route::post('/login', 'AuthController@login');
 Route::post('/register', 'AuthController@register');

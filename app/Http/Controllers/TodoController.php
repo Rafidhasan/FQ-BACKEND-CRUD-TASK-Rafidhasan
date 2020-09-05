@@ -13,7 +13,6 @@ use Auth;
 class TodoController extends Controller
 {
     public function index() {
-        dd(Auth::user());
         $todos = Auth::user()->todos;
 
         if(! $todos) {
@@ -22,31 +21,28 @@ class TodoController extends Controller
                 'data' => "no todos"
             ]);
         }   else {
-            return response()->json()([
+            return response()->json([
                 'success' => true,
-                'data' => $todos
+                'data' => "$todos"
             ]);
         }
     }
     public function store(Request $request) {
-        $this->validate($request, [
+
+        $request->validate([
             'name' => 'required',
-            // 'check' => 'accepted'
         ]);
 
         $todo = new Todo();
         $todo->name = $request->name;
-        $todo->check = $request->check;
+        $todo->user_id = auth()->id();
 
-        if(auth()->todos()->save($todos)) {
-            return response()->json()([
-                'success' => true,
-                'data' => $todos
-            ]);
+        if(! $todo) {
+            abort(404);
         }   else {
-            return response()->json()([
-                'success' => false,
-                'data' => 'no tasks for you'
+            return response()->json([
+                'success' => true,
+                'data' => $todo
             ]);
         }
     }
@@ -57,8 +53,8 @@ class TodoController extends Controller
         if(!$tasks) {
             return response()->json([
                 'success' => false,
-                'data' => 'Product with id'. $id. 'not found'
-            ], 500);
+                'data' => 'Task with id'. $id. 'not found'
+            ]);
         }
 
         $updated = $tasks->fill($request->all())->save();
@@ -67,28 +63,42 @@ class TodoController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => 'Tasks updated'
-            ], 200);
-        }   else {
-            return $response()->json([
-                'success' => false,
-                'data' => 'product could not be updated'
-            ], 500);
-        }
-    }
-
-    public function destroy($id) {
-        $tasks = auth()->user()->todos()->find($id);
-
-        if(!$tasks) {
-            return response()->json([
-                'success' => true,
-                'message' => 'task deleted'
             ]);
         }   else {
             return response()->json([
                 'success' => false,
-                'message' => 'product could not be deleted'
-            ], 500);
+                'data' => 'Task could not be updated'
+            ]);
         }
+    }
+
+    public function destroy($id){
+        $todo = auth()->user()->todos()->find($id);
+
+        if (!$todo){
+           return response()->json([
+                   'success' => false,
+                   'message' => 'Tasks with id'. $id . 'not found'
+           ]);
+        }
+
+        if($todo->delete()){
+           return response()->json([
+                   'success' => true,
+                   'message' => "Tasks deleted successfully"
+           ]);
+        }else{
+           return response()->json([
+                   'success' => false,
+                   'message' => 'Tasks could not be deleted'
+            ]);
+        }
+    }
+
+    public function complete($id) {
+        $todo = Todo::find($id);
+        $todo->completed($todo->id);
+
+        return redirect('/');
     }
 }

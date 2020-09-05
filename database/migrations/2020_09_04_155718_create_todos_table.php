@@ -17,6 +17,7 @@ class CreateTodosTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('name');
+            $table->boolean('check')->default(0);
             $table->timestamps();
 
             $table->foreign('user_id')
